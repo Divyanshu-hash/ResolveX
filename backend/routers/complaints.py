@@ -70,6 +70,8 @@ def create_complaint(
     db.refresh(complaint)
     categorize_complaint(db, complaint)
     add_log(db, complaint.id, current_user.id, "created", None, "submitted", "Complaint submitted")
+    db.commit()
+    db.refresh(complaint)
     return _complaint_to_response(db, complaint)
 
 

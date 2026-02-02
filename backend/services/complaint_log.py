@@ -21,6 +21,4 @@ def add_log(
         message=message,
     )
     db.add(log)
-    db.commit()
-    db.refresh(log)
     return log

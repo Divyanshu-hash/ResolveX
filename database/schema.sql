@@ -1,6 +1,3 @@
--- ResolveX Complaint / Issue Management System
--- MySQL Schema - Production-ready relational design
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

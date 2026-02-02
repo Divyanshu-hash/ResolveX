@@ -16,6 +16,10 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", " ", text.lower().strip())
 
 
+def _match_keyword(text: str, keyword: str) -> bool:
+    return re.search(rf"\b{re.escape(keyword.lower())}\b", text) is not None
+
+
 def _get_category_from_db(db: Session, description: str) -> tuple[Category | None, str]:
     """Match description against category keywords; return (category, priority)."""
     text = _normalize(description)
