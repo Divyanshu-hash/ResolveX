@@ -22,29 +22,75 @@ def seed_departments(db):
 def seed_categories(db):
     categories = [
         {
-            "name": "Water",
-            "keywords": ["water", "leak", "pipe", "tap", "pressure"],
+            "name": "Water & Plumbing",
+            "keywords": [
+                "water", "leak", "leakage", "pipe", "tap", "flush",
+                "toilet", "washroom", "bathroom", "geyser",
+                "no water", "low pressure", "overflow", "drain"
+            ],
             "priority": "medium",
         },
         {
             "name": "Electricity",
-            "keywords": ["electric", "power", "shock", "voltage", "switch"],
+            "keywords": [
+                "electric", "electricity", "power", "no power",
+                "switch", "socket", "plug", "short circuit",
+                "shock", "sparks", "voltage", "light", "fan"
+            ],
             "priority": "high",
         },
         {
-            "name": "Internet/Network",
-            "keywords": ["wifi", "internet", "slow", "connect"],
+            "name": "Internet / Network",
+            "keywords": [
+                "wifi", "internet", "network", "slow internet",
+                "no internet", "router", "connection", "lan"
+            ],
             "priority": "medium",
         },
         {
-            "name": "Cleaning",
-            "keywords": ["clean", "dirt", "garbage", "trash"],
+            "name": "Cleaning & Hygiene",
+            "keywords": [
+                "clean", "cleaning", "dirty", "garbage", "trash",
+                "smell", "odor", "toilet dirty", "washroom dirty",
+                "mosquito", "insects", "rats"
+            ],
             "priority": "low",
         },
         {
-            "name": "Security",
-            "keywords": ["theft", "lost", "guard", "access"],
+            "name": "Security & Safety",
+            "keywords": [
+                "theft", "stolen", "lost", "security",
+                "unauthorized", "intruder", "fight",
+                "gate", "guard", "unsafe", "lock broken"
+            ],
             "priority": "high",
+        },
+        {
+            "name": "Room & Furniture",
+            "keywords": [
+                "bed", "chair", "table", "cupboard",
+                "locker", "broken bed", "mattress",
+                "window", "door", "lock", "curtain"
+            ],
+            "priority": "low",
+        },
+        {
+            "name": "AC / Ventilation",
+            "keywords": [
+                "ac", "air conditioner", "cooling",
+                "not cooling", "fan not working",
+                "ventilation", "hot room"
+            ],
+            "priority": "medium",
+        },
+        {
+            "name": "Food & Mess",
+            "keywords": [
+                "food", "mess", "canteen",
+                "bad food", "quality", "stale",
+                "raw food", "hygiene", "food poisoning"
+            ],
+            "priority": "medium",
         },
     ]
 

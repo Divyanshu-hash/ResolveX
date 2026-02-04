@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import {
   BarChart,
@@ -31,11 +32,18 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 export default function Analytics() {
   const [data, setData] = useState<Summary | null>(null)
+  const [insights, setInsights] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    API.get('/analytics/summary')
-      .then(({ data }) => setData(data))
+    Promise.all([
+      API.get('/analytics/summary'),
+      API.get('/analytics/insights').catch(() => ({ data: 'AI Insights unavailable.' }))
+    ])
+      .then(([summaryRes, insightsRes]) => {
+        setData(summaryRes.data)
+        setInsights(insightsRes.data)
+      })
       .catch(() => setData(null))
       .finally(() => setLoading(false))
   }, [])
@@ -78,6 +86,24 @@ export default function Analytics() {
           <p className="text-2xl font-bold text-red-400 mt-1">{data.escalated_complaints}</p>
         </div>
       </div>
+
+      {/* AI Insights Section */}
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-6 mb-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <svg width="100" height="100" viewBox="0 0 24 24" fill="currentColor" className="text-purple-500">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4 flex items-center gap-2">
+          <span>✨</span> AI Executive Insights
+        </h2>
+        <div className="prose prose-invert max-w-none text-slate-300 font-sans">
+          <ReactMarkdown>
+            {insights || "Generating insights..."}
+          </ReactMarkdown>
+        </div>
+      </div>
+
 
       {data.avg_resolution_hours != null && (
         <div className="bg-slate-900 border border-slate-700 rounded-xl p-5 mb-8">

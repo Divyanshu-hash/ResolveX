@@ -51,9 +51,33 @@ def _get_category_from_db(db: Session, description: str) -> tuple[Category | Non
     return best_match, best_priority
 
 
+
+from services.ai_service import AIService
+
 def categorize_complaint(db: Session, complaint: Complaint) -> None:
     """Auto-assign category and priority from description; update complaint."""
-    category, priority = _get_category_from_db(db, complaint.description)
+    # Try AI prediction first
+    ai_service = AIService()
+    ai_result = ai_service.predict_category_and_urgency(complaint.title, complaint.description)
+    
+    category = None
+    priority = "medium"
+
+    if ai_result:
+        # Try to find the AI-predicted category in DB
+        category_name = ai_result.get("category")
+        priority = ai_result.get("priority", "medium")
+        if category_name:
+            category = db.query(Category).filter(Category.name.ilike(category_name)).first()
+    
+    # Fallback to keyword matching if AI failed or category not found
+    if not category:
+         cat_match, prio_match = _get_category_from_db(db, complaint.description)
+         category = cat_match
+         # If AI gave a priority but no category, keep AI priority, else use keyword priority
+         if not ai_result:
+             priority = prio_match
+
     old_status = complaint.status
     complaint.priority = priority
     if category:

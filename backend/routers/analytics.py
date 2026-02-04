@@ -6,6 +6,7 @@ from database import get_db
 from dependencies import get_current_user, RequireAdmin
 from models import User, Complaint, Assignment, Category, Feedback
 from schemas import AnalyticsSummary
+from services.ai_service import AIService
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -92,3 +93,19 @@ def get_analytics_summary(
         complaints_by_month=complaints_by_month,
         staff_performance=staff_performance,
     )
+
+
+@router.get("/insights", response_model=str)
+def get_dashboard_insights(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(RequireAdmin),
+):
+    # Reuse the summary logic
+    summary = get_analytics_summary(db, current_user)
+    
+    # Convert Pydantic model to dict
+    summary_dict = summary.model_dump()
+    
+    # Generate insights
+    ai_service = AIService()
+    return ai_service.generate_dashboard_insights(summary_dict)
