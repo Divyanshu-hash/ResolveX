@@ -42,6 +42,7 @@ type AuthState = {
   register: (email: string, password: string, full_name: string, role?: string) => Promise<void>
   logout: () => void
   refreshUser: () => Promise<void>
+  googleLogin: (token: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthState | null>(null)
@@ -110,6 +111,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ) => {
     await API.post('/auth/register', { email, password, full_name, role })
     await login(email, password)
+    await login(email, password)
+  }
+
+  const googleLogin = async (tokenString: string) => {
+    const { data } = await API.post('/auth/google', { token: tokenString })
+    setToken(data.access_token)
+    setUser(data.user)
+    localStorage.setItem('token', data.access_token)
+    localStorage.setItem('user', JSON.stringify(data.user))
   }
 
   const logout = () => {
@@ -129,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         logout,
         refreshUser,
+        googleLogin,
       }}
     >
       {children}

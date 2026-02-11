@@ -23,6 +23,8 @@ class User(Base):
     full_name = Column(String(150), nullable=False)
     role = Column(Enum("user", "staff", "admin", "super_admin"), default="user", nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id", ondelete="SET NULL"))
+    google_id = Column(String(255), unique=True, nullable=True)
+    avatar_url = Column(String(512), nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow, onupdate=datetime.utcnow)

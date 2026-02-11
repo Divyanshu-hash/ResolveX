@@ -6,14 +6,28 @@ import { Hexagon, Lock, Mail, ArrowRight, Loader2, AlertTriangle } from 'lucide-
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const { login, googleLogin } = useAuth()
   const navigate = useNavigate()
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+      try {
+        setLoading(true)
+        await googleLogin(credentialResponse.credential)
+        navigate('/')
+      } catch {
+        setError("Google Login Failed")
+        setLoading(false)
+      }
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -119,15 +133,34 @@ export default function Login() {
                 )}
               </Button>
             </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-zinc-800" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-zinc-950 px-2 text-zinc-500">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google Login Failed")}
+                theme="filled_black"
+                shape="pill"
+                width="320"
+              />
+            </div>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-zinc-500">Don't have an account? </span>
+              <Link to="/register" className="text-white hover:underline underline-offset-4 font-medium">
+                Register
+              </Link>
+            </div>
           </CardContent>
         </Card>
-
-        <p className="mt-8 text-center text-zinc-500 text-sm">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-white hover:underline transition-colors font-medium">
-            Register for access
-          </Link>
-        </p>
       </motion.div>
     </div>
   )

@@ -10,6 +10,7 @@ class UserResponse(BaseModel):
     full_name: str
     role: str
     department_id: Optional[int] = None
+    avatar_url: Optional[str] = None
     is_active: bool
     created_at: datetime
 
@@ -23,6 +24,10 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+
+class GoogleLoginRequest(BaseModel):
+    token: str
 
 
 class TokenData(BaseModel):
