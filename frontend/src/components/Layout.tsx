@@ -33,8 +33,7 @@ export default function Layout() {
               key={l.to}
               to={l.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive ? 'bg-primary-600/30 text-primary-300' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary-600/30 text-primary-300' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                 }`
               }
             >

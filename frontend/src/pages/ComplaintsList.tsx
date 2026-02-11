@@ -103,11 +103,10 @@ export default function ComplaintsList() {
                     </td>
                     <td className="p-4">
                       <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${
-                          r.priority === 'critical' ? 'bg-red-600/30 text-red-300' :
-                          r.priority === 'high' ? 'bg-amber-600/30 text-amber-300' :
-                          'bg-primary-600/30 text-primary-300'
-                        }`}
+                        className={`px-2 py-0.5 rounded text-xs font-medium capitalize ${r.priority === 'critical' ? 'bg-red-600/30 text-red-300' :
+                            r.priority === 'high' ? 'bg-amber-600/30 text-amber-300' :
+                              'bg-primary-600/30 text-primary-300'
+                          }`}
                       >
                         {r.priority}
                         {r.is_escalated && ' ⬆'}

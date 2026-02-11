@@ -3,6 +3,8 @@ import json
 import re
 from sqlalchemy.orm import Session
 from models import Category, Complaint
+from services.ai_service import AIService
+
 
 # Fallback keyword -> priority (when no category match)
 PRIORITY_KEYWORDS = {
@@ -52,7 +54,6 @@ def _get_category_from_db(db: Session, description: str) -> tuple[Category | Non
 
 
 
-from services.ai_service import AIService
 
 def categorize_complaint(db: Session, complaint: Complaint) -> None:
     """Auto-assign category and priority from description; update complaint."""

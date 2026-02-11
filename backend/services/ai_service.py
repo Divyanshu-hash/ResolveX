@@ -69,11 +69,11 @@ Return format:
                     "prompt": prompt,
                     "stream": False,
                 },
-                timeout=5,  # fast fail
+                timeout=15,  # fast fail
             )
 
             output = response.json().get("response", "").strip()
-            return self._parse_response(output)
+            
 
         except Exception as e:
             logger.error(f"Ollama categorization failed: {e}")
@@ -172,14 +172,41 @@ The final output should feel like a **human-written executive report**, not an A
         try:
             text = text.strip()
 
-            # Remove markdown fences if present
-            if text.startswith("```"):
-                text = text.split("```")[1]
+           
+            if "```" in text:
+                text = text.replace("```json", "").replace("```", "").strip()
+
+           
+            start = text.find("{")
+            end = text.rfind("}")
+            if start == -1 or end == -1:
+                return None
+
+            text = text[start:end + 1]
 
             result = json.loads(text)
+
+            
+            if isinstance(result, dict) and "complaint_analysis" in result:
+                analysis = result.get("complaint_analysis")
+                if isinstance(analysis, list) and analysis:
+                    result = analysis[0]
+
+            
+            category = result.get("category", "").strip()
+            priority = result.get("priority", "low").lower()
+
+            
+            VALID_PRIORITIES = {"low", "medium", "high", "critical"}
+
+            
+
+            if priority not in VALID_PRIORITIES:
+                priority = "low"
+
             return {
-                "category": result.get("category", "General"),
-                "priority": result.get("priority", "medium").lower(),
+                "category": category,
+                "priority": priority,
             }
 
         except Exception as e:
