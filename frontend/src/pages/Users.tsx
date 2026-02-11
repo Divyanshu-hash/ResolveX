@@ -7,13 +7,10 @@ import {
   Search,
   User,
   Mail,
-  Shield,
   Calendar,
-  MoreVertical,
   CheckCircle2,
   XCircle,
   Loader2,
-  Trash2
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
@@ -31,7 +28,7 @@ type UserRow = {
 }
 
 const roleConfig: Record<string, { label: string, color: string }> = {
-  'user': { label: 'User', color: 'text-slate-400 bg-slate-500/10 border-slate-500/20' },
+  'user': { label: 'User', color: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20' },
   'staff': { label: 'Staff', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
   'admin': { label: 'Admin', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
   'super_admin': { label: 'Super Admin', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
@@ -85,8 +82,8 @@ export default function Users() {
     return (
       <div className="h-full flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary shadow-[0_0_20px_-5px_rgba(6,182,212,0.5)]" />
-          <p className="text-muted-foreground animate-pulse text-sm">Loading Team...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-700" />
+          <p className="text-zinc-500 animate-pulse text-sm">Loading Team...</p>
         </div>
       </div>
     )
@@ -101,10 +98,10 @@ export default function Users() {
       >
         <div>
           <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Team Management</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Manage users and access controls</p>
+          <p className="text-zinc-400 mt-1 text-lg">Manage users and access controls</p>
         </div>
         {isSuperAdmin && (
-          <Button variant="glass" size="lg" className="group shrink-0" onClick={() => setShowForm(!showForm)}>
+          <Button variant="default" size="lg" className="group shrink-0 bg-white text-black hover:bg-zinc-200" onClick={() => setShowForm(!showForm)}>
             {showForm ? <XCircle className="w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />}
             {showForm ? 'Cancel' : 'Add User'}
           </Button>
@@ -117,13 +114,13 @@ export default function Users() {
           className={cn("space-y-6 transition-all duration-500", showForm && isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3")}
           layout
         >
-          <Card className="min-h-[600px] flex flex-col">
-            <CardHeader className="border-b border-white/5 pb-6">
+          <Card className="min-h-[600px] flex flex-col border-zinc-800 bg-zinc-900/50 backdrop-blur-md">
+            <CardHeader className="border-b border-zinc-800 pb-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <Input
                   placeholder="Search users..."
-                  className="pl-10 max-w-md bg-white/5 border-white/10 focus:border-primary/50"
+                  className="pl-10 max-w-md bg-zinc-950/50 border-zinc-800 focus:border-white/20"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -132,17 +129,17 @@ export default function Users() {
             <CardContent className="p-0 flex-1">
               {filteredUsers.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full py-20 text-center">
-                  <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
-                    <User className="w-8 h-8 text-muted-foreground" />
+                  <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-zinc-800">
+                    <User className="w-8 h-8 text-zinc-600" />
                   </div>
                   <h3 className="text-lg font-medium text-white">No users found</h3>
-                  <p className="text-muted-foreground mt-1">Try adjusting your search terms.</p>
+                  <p className="text-zinc-500 mt-1">Try adjusting your search terms.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-white/5 text-xs text-muted-foreground uppercase tracking-wider">
+                      <tr className="border-b border-zinc-800 text-xs text-zinc-500 uppercase tracking-wider">
                         <th className="p-6 font-medium">User</th>
                         <th className="p-6 font-medium">Role</th>
                         <th className="p-6 font-medium">Status</th>
@@ -158,37 +155,37 @@ export default function Users() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2, delay: index * 0.05 }}
-                            className="group border-b border-white/5 hover:bg-white/5 transition-colors"
+                            className="group border-b border-zinc-800 hover:bg-zinc-800/50 transition-colors"
                           >
                             <td className="p-6">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center border border-white/10 ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+                                <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700 ring-2 ring-transparent group-hover:ring-zinc-600 transition-all">
                                   <span className="text-sm font-bold text-white uppercase">{u.full_name?.charAt(0)}</span>
                                 </div>
                                 <div>
-                                  <p className="font-medium text-white group-hover:text-primary transition-colors">{u.full_name}</p>
-                                  <p className="text-xs text-muted-foreground">{u.email}</p>
+                                  <p className="font-medium text-white group-hover:text-zinc-200 transition-colors">{u.full_name}</p>
+                                  <p className="text-xs text-zinc-500">{u.email}</p>
                                 </div>
                               </div>
                             </td>
                             <td className="p-6">
-                              <div className={cn("inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border capitalize", (roleConfig[u.role] || roleConfig.user).color)}>
+                              <div className={cn("inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide border", (roleConfig[u.role] || roleConfig.user).color)}>
                                 {u.role.replace('_', ' ')}
                               </div>
                             </td>
                             <td className="p-6">
                               {u.is_active ? (
-                                <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-400">
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-500">
                                   <CheckCircle2 className="w-3.5 h-3.5" /> Active
                                 </div>
                               ) : (
-                                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-500">
                                   <XCircle className="w-3.5 h-3.5" /> Inactive
                                 </div>
                               )}
                             </td>
                             <td className="p-6">
-                              <div className="flex items-center gap-1.5 text-sm text-slate-400">
+                              <div className="flex items-center gap-1.5 text-sm text-zinc-500">
                                 <Calendar className="w-3.5 h-3.5" />
                                 {new Date(u.created_at).toLocaleDateString()}
                               </div>
@@ -213,10 +210,10 @@ export default function Users() {
               exit={{ opacity: 0, x: 20 }}
               className="lg:col-span-1"
             >
-              <Card className="sticky top-6 border-primary/20 bg-slate-900/80 backdrop-blur-xl shadow-2xl shadow-black/50">
+              <Card className="sticky top-6 border-zinc-700 bg-zinc-900 border shadow-2xl">
                 <CardHeader>
-                  <CardTitle>Add New User</CardTitle>
-                  <CardDescription>Create a new account for a staff member or admin.</CardDescription>
+                  <CardTitle className="text-white">Add New User</CardTitle>
+                  <CardDescription className="text-zinc-400">Create a new account for a staff member or admin.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleCreate} className="space-y-4">
@@ -224,14 +221,14 @@ export default function Users() {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
-                        className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm"
+                        className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm"
                       >
                         {error}
                       </motion.div>
                     )}
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
+                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Full Name</label>
                       <Input
                         placeholder="John Doe"
                         value={form.full_name}
@@ -241,7 +238,7 @@ export default function Users() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</label>
+                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Email</label>
                       <Input
                         type="email"
                         placeholder="john@example.com"
@@ -252,7 +249,7 @@ export default function Users() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Password</label>
+                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Password</label>
                       <Input
                         type="password"
                         placeholder="Min 6 characters"
@@ -264,11 +261,11 @@ export default function Users() {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</label>
+                      <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Role</label>
                       <select
                         value={form.role}
                         onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                        className="w-full px-3 py-2 rounded-lg bg-slate-950/50 border border-white/10 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="w-full px-3 py-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-sm text-white focus:outline-none focus:border-white/20"
                       >
                         <option value="user">User</option>
                         <option value="staff">Staff</option>
@@ -277,7 +274,7 @@ export default function Users() {
                       </select>
                     </div>
 
-                    <Button type="submit" className="w-full mt-4" disabled={creating}>
+                    <Button type="submit" className="w-full mt-4 bg-white text-black hover:bg-zinc-200" disabled={creating}>
                       {creating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating...

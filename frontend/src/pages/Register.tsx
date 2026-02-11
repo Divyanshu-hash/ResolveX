@@ -32,12 +32,11 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-primary/10 blur-[120px] rounded-full pointer-events-none opacity-50" />
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.04] mix-blend-overlay pointer-events-none" />
+      {/* Stealth Ambient Background */}
+      <div className="bg-stealth-curves absolute inset-0 z-0 opacity-40 mix-blend-screen" />
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md relative z-10"
       >
@@ -46,19 +45,19 @@ export default function Register() {
             <motion.div
               whileHover={{ rotate: 90 }}
               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center shadow-lg shadow-primary/25 mx-auto mb-4"
+              className="w-12 h-12 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center mx-auto mb-4"
             >
-              <Hexagon className="text-white w-6 h-6 fill-white/20" />
+              <Hexagon className="text-white w-6 h-6 fill-white" />
             </motion.div>
           </Link>
-          <h1 className="text-3xl font-bold font-heading tracking-tight text-white">Join ResolveX</h1>
-          <p className="text-muted-foreground mt-2">Create your account to start managing issues</p>
+          <h1 className="text-2xl font-bold font-heading tracking-tight text-white">Join ResolveX</h1>
+          <p className="text-zinc-500 mt-2">Create your account to start managing issues</p>
         </div>
 
-        <Card className="border-white/10 shadow-2xl shadow-black/50 bg-slate-900/60 backdrop-blur-xl">
+        <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-md">
           <CardHeader>
-            <CardTitle className="text-center">Register</CardTitle>
-            <CardDescription className="text-center">Start your 14-day free trial</CardDescription>
+            <CardTitle className="text-center text-white">Register</CardTitle>
+            <CardDescription className="text-center text-zinc-500">Start your 14-day free trial</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,21 +65,21 @@ export default function Register() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2"
+                  className="p-3 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2"
                 >
                   <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
                 </motion.div>
               )}
 
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Full Name</label>
+                <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Full Name</label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                   <Input
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="pl-10 bg-slate-950/50 border-white/5 focus:border-primary/50"
+                    className="pl-10 bg-zinc-950/50 border-zinc-800 focus:border-white/20 text-white placeholder:text-zinc-700"
                     placeholder="John Doe"
                     required
                   />
@@ -88,14 +87,14 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Email Address</label>
+                <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Email Address</label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-slate-950/50 border-white/5 focus:border-primary/50"
+                    className="pl-10 bg-zinc-950/50 border-zinc-800 focus:border-white/20 text-white placeholder:text-zinc-700"
                     placeholder="name@company.com"
                     required
                   />
@@ -103,14 +102,14 @@ export default function Register() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Password</label>
+                <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                   <Input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-slate-950/50 border-white/5 focus:border-primary/50"
+                    className="pl-10 bg-zinc-950/50 border-zinc-800 focus:border-white/20 text-white placeholder:text-zinc-700"
                     placeholder="Min 6 characters"
                     minLength={6}
                     required
@@ -120,7 +119,7 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="w-full mt-2"
+                className="w-full mt-2 bg-white text-black hover:bg-zinc-200"
                 size="lg"
                 disabled={loading}
               >
@@ -138,9 +137,9 @@ export default function Register() {
           </CardContent>
         </Card>
 
-        <p className="mt-8 text-center text-muted-foreground text-sm">
+        <p className="mt-8 text-center text-zinc-500 text-sm">
           Already have an account?{' '}
-          <Link to="/login" className="text-primary hover:text-primary-300 transition-colors font-medium">
+          <Link to="/login" className="text-white hover:underline transition-colors font-medium">
             Sign in
           </Link>
         </p>

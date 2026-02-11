@@ -18,7 +18,6 @@ import {
 import { API } from '../context/AuthContext'
 import { Sparkles, BarChart3, PieChart as PieChartIcon, TrendingUp, Users } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
-import { cn } from '../lib/utils'
 
 type Summary = {
   total_complaints: number
@@ -32,14 +31,15 @@ type Summary = {
   staff_performance: Array<{ staff_name: string; resolved_count: number }>
 }
 
-const COLORS = ['#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899']
+// Vibrant Neon Colors for charts to fix "dullness"
+const COLORS = ['#06b6d4', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#f43f5e']
 
 const theme = {
-  background: '#0f172a',
-  text: '#94a3b8',
-  tooltipBg: '#1e293b',
-  tooltipBorder: '#334155',
-  grid: '#334155',
+  background: '#09090b', // zinc-950
+  text: '#d4d4d8', // zinc-300 (lighter than before)
+  tooltipBg: '#18181b', // zinc-900
+  tooltipBorder: '#27272a', // zinc-800
+  grid: '#27272a', // zinc-800
 }
 
 export default function Analytics() {
@@ -65,7 +65,7 @@ export default function Analytics() {
       <div className="h-full flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary shadow-[0_0_20px_-5px_rgba(6,182,212,0.5)]" />
-          <p className="text-muted-foreground animate-pulse text-sm">Generating analytics...</p>
+          <p className="text-zinc-400 animate-pulse text-sm">Generating analytics...</p>
         </div>
       </div>
     )
@@ -73,7 +73,7 @@ export default function Analytics() {
 
   if (!data) {
     return (
-      <div className="p-8 text-center text-muted-foreground">
+      <div className="p-8 text-center text-zinc-500">
         Failed to load analytics data.
       </div>
     )
@@ -103,39 +103,39 @@ export default function Analytics() {
       >
         <div>
           <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Analytics & Insights</h1>
-          <p className="text-muted-foreground mt-1 text-lg">Data-driven performance metrics</p>
+          <p className="text-zinc-400 mt-1 text-lg">Data-driven performance metrics</p>
         </div>
       </motion.div>
 
       <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div variants={item}>
-          <Card className="bg-slate-900/50 border-white/5">
+          <Card className="bg-zinc-900 border-zinc-800 hover:border-white/20 transition-all shadow-lg hover:shadow-cyan-500/10 group">
             <CardContent className="p-6">
-              <p className="text-sm font-medium text-muted-foreground">Total Tickets</p>
+              <p className="text-sm font-medium text-zinc-400 group-hover:text-white transition-colors">Total Tickets</p>
               <p className="text-3xl font-bold font-heading text-white mt-2">{data.total_complaints}</p>
             </CardContent>
           </Card>
         </motion.div>
         <motion.div variants={item}>
-          <Card className="bg-amber-500/5 border-amber-500/10">
+          <Card className="bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40 transition-all shadow-lg hover:shadow-amber-500/10">
             <CardContent className="p-6">
-              <p className="text-sm font-medium text-amber-500/80">Open Issues</p>
+              <p className="text-sm font-medium text-amber-500">Open Issues</p>
               <p className="text-3xl font-bold font-heading text-amber-500 mt-2">{data.open_complaints}</p>
             </CardContent>
           </Card>
         </motion.div>
         <motion.div variants={item}>
-          <Card className="bg-emerald-500/5 border-emerald-500/10">
+          <Card className="bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40 transition-all shadow-lg hover:shadow-emerald-500/10">
             <CardContent className="p-6">
-              <p className="text-sm font-medium text-emerald-500/80">Resolved</p>
+              <p className="text-sm font-medium text-emerald-500">Resolved</p>
               <p className="text-3xl font-bold font-heading text-emerald-500 mt-2">{data.resolved_complaints}</p>
             </CardContent>
           </Card>
         </motion.div>
         <motion.div variants={item}>
-          <Card className="bg-red-500/5 border-red-500/10">
+          <Card className="bg-red-500/5 border-red-500/20 hover:border-red-500/40 transition-all shadow-lg hover:shadow-red-500/10">
             <CardContent className="p-6">
-              <p className="text-sm font-medium text-red-500/80">Escalated</p>
+              <p className="text-sm font-medium text-red-500">Escalated</p>
               <p className="text-3xl font-bold font-heading text-red-500 mt-2">{data.escalated_complaints}</p>
             </CardContent>
           </Card>
@@ -148,23 +148,23 @@ export default function Analytics() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-slate-900/90 to-slate-800/90 shadow-2xl shadow-primary/5">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
+        <Card className="relative overflow-hidden border-indigo-500/20 bg-gradient-to-br from-zinc-900 to-indigo-950/30 shadow-2xl shadow-indigo-500/5">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
 
           <CardHeader className="relative z-10 pb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
-                <CardTitle className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 text-xl">AI Executive Insights</CardTitle>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mt-0.5">Automated Intelligence Report</p>
+                <CardTitle className="text-white text-xl">AI Executive Insights</CardTitle>
+                <p className="text-xs text-indigo-300 uppercase tracking-wider font-medium mt-0.5">Automated Intelligence Report</p>
               </div>
             </div>
           </CardHeader>
           <CardContent className="relative z-10 pt-4">
-            <div className="prose prose-invert max-w-none prose-p:text-slate-300 prose-headings:text-white prose-strong:text-white prose-li:text-slate-300 font-sans leading-relaxed">
+            <div className="prose prose-invert max-w-none prose-p:text-zinc-300 prose-headings:text-white prose-strong:text-white prose-li:text-zinc-300 font-sans leading-relaxed">
               <ReactMarkdown
                 components={{
                   h1: ({ node, ...props }) => <h3 className="text-lg font-bold text-white mt-4 mb-2" {...props} />,
@@ -189,12 +189,12 @@ export default function Analytics() {
         className="grid gap-8 lg:grid-cols-2"
       >
         <motion.div variants={item}>
-          <Card className="h-full">
+          <Card className="h-full border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/80 transition-colors">
             <CardHeader className="flex flex-row items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">
+              <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-500">
                 <BarChart3 className="w-5 h-5" />
               </div>
-              <CardTitle className="text-base">Complaints by Category</CardTitle>
+              <CardTitle className="text-base text-zinc-100">Complaints by Category</CardTitle>
             </CardHeader>
             <CardContent>
               {data.complaints_by_category.length > 0 ? (
@@ -208,7 +208,7 @@ export default function Analytics() {
                         contentStyle={{ backgroundColor: theme.tooltipBg, borderColor: theme.tooltipBorder, borderRadius: '8px', color: '#fff' }}
                         cursor={{ fill: 'rgba(255,255,255,0.05)' }}
                       />
-                      <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                      <Bar dataKey="count" fill="#fafafa" radius={[4, 4, 0, 0]}>
                         {data.complaints_by_category.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
@@ -217,19 +217,19 @@ export default function Analytics() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="h-[300px] flex items-center justify-center text-zinc-500">No data available</div>
               )}
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={item}>
-          <Card className="h-full">
+          <Card className="h-full border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/80 transition-colors">
             <CardHeader className="flex flex-row items-center gap-3">
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                 <PieChartIcon className="w-5 h-5" />
               </div>
-              <CardTitle className="text-base">Priority Distribution</CardTitle>
+              <CardTitle className="text-base text-zinc-100">Priority Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               {data.complaints_by_priority.length > 0 ? (
@@ -255,7 +255,7 @@ export default function Analytics() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="h-[300px] flex items-center justify-center text-zinc-500">No data available</div>
               )}
             </CardContent>
           </Card>
@@ -269,12 +269,12 @@ export default function Analytics() {
         className="grid gap-8 lg:grid-cols-2"
       >
         <motion.div variants={item}>
-          <Card className="h-full">
+          <Card className="h-full border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/80 transition-colors">
             <CardHeader className="flex flex-row items-center gap-3">
-              <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
+              <div className="p-2 rounded-lg bg-violet-500/10 text-violet-500">
                 <TrendingUp className="w-5 h-5" />
               </div>
-              <CardTitle className="text-base">Monthly Trend</CardTitle>
+              <CardTitle className="text-base text-zinc-100">Monthly Trend</CardTitle>
             </CardHeader>
             <CardContent>
               {data.complaints_by_month.length > 0 ? (
@@ -289,27 +289,27 @@ export default function Analytics() {
                         type="monotone"
                         dataKey="count"
                         stroke="#8b5cf6"
-                        strokeWidth={4}
+                        strokeWidth={3}
                         dot={{ fill: '#8b5cf6', strokeWidth: 2, r: 4 }}
-                        activeDot={{ r: 8 }}
+                        activeDot={{ r: 6 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="h-[300px] flex items-center justify-center text-zinc-500">No data available</div>
               )}
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={item}>
-          <Card className="h-full">
+          <Card className="h-full border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/80 transition-colors">
             <CardHeader className="flex flex-row items-center gap-3">
               <div className="p-2 rounded-lg bg-pink-500/10 text-pink-500">
                 <Users className="w-5 h-5" />
               </div>
-              <CardTitle className="text-base">Staff Performance</CardTitle>
+              <CardTitle className="text-base text-zinc-100">Staff Performance</CardTitle>
             </CardHeader>
             <CardContent>
               {data.staff_performance.length > 0 ? (
@@ -329,7 +329,7 @@ export default function Analytics() {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="h-[300px] flex items-center justify-center text-muted-foreground">No data available</div>
+                <div className="h-[300px] flex items-center justify-center text-zinc-500">No data available</div>
               )}
             </CardContent>
           </Card>

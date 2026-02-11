@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { API } from '../context/AuthContext'
 import { useAuth } from '../context/AuthContext'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   ArrowLeft,
   MapPin,
@@ -21,7 +21,8 @@ import {
   MessageSquare,
   HelpCircle,
   Paperclip,
-  Loader2
+  Loader2,
+  Inbox
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
@@ -59,18 +60,18 @@ type Evidence = { id: number; file_name: string; file_type: string; created_at: 
 
 const statusConfig: Record<string, { label: string, color: string, icon: any }> = {
   'open': { label: 'Open', color: 'text-amber-500 bg-amber-500/10 border-amber-500/20', icon: Clock },
-  'submitted': { label: 'Submitted', color: 'text-blue-500 bg-blue-500/10 border-blue-500/20', icon: HelpCircle },
-  'in_progress': { label: 'In Progress', color: 'text-purple-500 bg-purple-500/10 border-purple-500/20', icon: Clock },
+  'submitted': { label: 'Submitted', color: 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20', icon: Inbox },
+  'in_progress': { label: 'In Progress', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', icon: Clock },
   'resolved': { label: 'Resolved', color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20', icon: CheckCircle2 },
-  'closed': { label: 'Closed', color: 'text-slate-500 bg-slate-500/10 border-slate-500/20', icon: CheckCircle2 },
-  'default': { label: 'Unknown', color: 'text-slate-500', icon: HelpCircle }
+  'closed': { label: 'Closed', color: 'text-zinc-600 bg-zinc-500/5 border-zinc-500/10', icon: CheckCircle2 },
+  'default': { label: 'Unknown', color: 'text-zinc-500', icon: HelpCircle }
 }
 
 const priorityConfig: Record<string, { label: string, color: string }> = {
-  'low': { label: 'Low', color: 'text-slate-400 bg-slate-500/10 border-slate-500/20' },
-  'medium': { label: 'Medium', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
-  'high': { label: 'High', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
-  'critical': { label: 'Critical', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
+  'low': { label: 'Low', color: 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20' },
+  'medium': { label: 'Medium', color: 'text-amber-500 bg-amber-500/10 border-amber-500/20' },
+  'high': { label: 'High', color: 'text-orange-500 bg-orange-500/10 border-orange-500/20' },
+  'critical': { label: 'Critical', color: 'text-red-500 bg-red-500/10 border-red-500/20' },
 }
 
 export default function ComplaintDetail() {
@@ -169,8 +170,8 @@ export default function ComplaintDetail() {
     return (
       <div className="h-full flex items-center justify-center min-h-[50vh]">
         <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary shadow-[0_0_20px_-5px_rgba(6,182,212,0.5)]" />
-          <p className="text-muted-foreground animate-pulse text-sm">Loading details...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-700" />
+          <p className="text-zinc-500 animate-pulse text-sm">Loading details...</p>
         </div>
       </div>
     )
@@ -188,7 +189,7 @@ export default function ComplaintDetail() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
       >
-        <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-primary" onClick={() => navigate(-1)}>
+        <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-white text-zinc-400 transition-colors" onClick={() => navigate(-1)}>
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Complaints
         </Button>
 
@@ -196,19 +197,19 @@ export default function ComplaintDetail() {
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-bold font-heading text-white tracking-tight">{complaint.title}</h1>
-              <div className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border", (statusConfig[complaint.status] || statusConfig.default).color)}>
+              <div className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded text-sm font-bold uppercase tracking-wide border", (statusConfig[complaint.status] || statusConfig.default).color)}>
                 <StatusIcon className="w-4 h-4" />
                 {(statusConfig[complaint.status] || statusConfig.default).label}
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-400">
               <div className="flex items-center gap-1.5">
                 <Tag className="w-4 h-4" />
                 <span>{complaint.category_name || 'Uncategorized'}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <User className="w-4 h-4" />
-                <span>Created by <span className="text-slate-300">{complaint.user_name}</span></span>
+                <span>Created by <span className="text-zinc-200">{complaint.user_name}</span></span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4" />
@@ -224,14 +225,14 @@ export default function ComplaintDetail() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className={cn("flex items-center gap-2 px-4 py-2 rounded-lg border bg-slate-900/50 backdrop-blur-sm", (priorityConfig[complaint.priority] || priorityConfig.low).color)}>
+            <div className={cn("flex items-center gap-2 px-4 py-2 rounded-lg border bg-zinc-900/50 backdrop-blur-sm", (priorityConfig[complaint.priority] || priorityConfig.low).color)}>
               <AlertTriangle className="w-4 h-4" />
-              <span className="font-medium uppercase tracking-wider text-xs">Priority: {complaint.priority}</span>
+              <span className="font-bold uppercase tracking-wider text-xs">Priority: {complaint.priority}</span>
             </div>
             {complaint.is_escalated && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-red-500/10 border-red-500/20 text-red-400">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-red-500/10 border-red-500/20 text-red-500">
                 <ShieldCheck className="w-4 h-4" />
-                <span className="font-medium uppercase tracking-wider text-xs">Escalated</span>
+                <span className="font-bold uppercase tracking-wider text-xs">Escalated</span>
               </div>
             )}
           </div>
@@ -247,13 +248,13 @@ export default function ComplaintDetail() {
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <FileText className="w-5 h-5 text-white/70" />
                 Description
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap leading-relaxed">
+              <div className="prose prose-invert max-w-none text-zinc-300 whitespace-pre-wrap leading-relaxed">
                 {complaint.description}
               </div>
             </CardContent>
@@ -261,28 +262,28 @@ export default function ComplaintDetail() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <History className="w-5 h-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-white">
+                <History className="w-5 h-5 text-white/70" />
                 Timeline
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="relative pl-4 border-l border-white/10 space-y-8 ml-2">
-                {logs.length === 0 && <p className="text-muted-foreground text-sm italic">No activity recorded yet.</p>}
-                {logs.map((log, index) => (
+              <div className="relative pl-4 border-l border-zinc-800 space-y-8 ml-2">
+                {logs.length === 0 && <p className="text-zinc-500 text-sm italic">No activity recorded yet.</p>}
+                {logs.map((log) => (
                   <div key={log.id} className="relative">
-                    <div className="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-slate-800 border border-primary/50 ring-4 ring-slate-900" />
+                    <div className="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-zinc-800 border border-zinc-700 ring-4 ring-zinc-950" />
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium text-white capitalize">{log.action.replace('_', ' ')}</span>
-                        <span className="text-xs text-muted-foreground">• {new Date(log.created_at).toLocaleString()}</span>
+                        <span className="font-bold text-zinc-200 capitalize">{log.action.replace('_', ' ')}</span>
+                        <span className="text-xs text-zinc-500">• {new Date(log.created_at).toLocaleString()}</span>
                       </div>
-                      <p className="text-sm text-slate-400">
+                      <p className="text-sm text-zinc-400">
                         {log.user_name ?? 'System'}
                         {log.old_value && log.new_value && (
-                          <span className="text-slate-500"> changed from <span className="text-slate-300">{log.old_value}</span> to <span className="text-slate-300">{log.new_value}</span></span>
+                          <span className="text-zinc-500"> changed from <span className="text-zinc-300">{log.old_value}</span> to <span className="text-zinc-300">{log.new_value}</span></span>
                         )}
-                        {log.message && <span className="text-slate-400"> — {log.message}</span>}
+                        {log.message && <span className="text-zinc-400"> — {log.message}</span>}
                       </p>
                     </div>
                   </div>
@@ -301,23 +302,23 @@ export default function ComplaintDetail() {
           {/* Assigned Staff Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="w-4 h-4 text-primary" /> Assigned Staff
+              <CardTitle className="text-base flex items-center gap-2 text-zinc-200">
+                <User className="w-4 h-4 text-white/70" /> Assigned Staff
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {complaint.assigned_staff_name ? (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-cyan-400 flex items-center justify-center text-black font-bold">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                  <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold border border-zinc-700">
                     {complaint.assigned_staff_name.charAt(0)}
                   </div>
                   <div>
                     <p className="font-medium text-white">{complaint.assigned_staff_name}</p>
-                    <p className="text-xs text-muted-foreground">Staff Member</p>
+                    <p className="text-xs text-zinc-500">Staff Member</p>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground italic">No staff assigned yet.</p>
+                <p className="text-sm text-zinc-500 italic">No staff assigned yet.</p>
               )}
 
               {canEdit && (user?.role === 'admin' || user?.role === 'super_admin') && complaint.status !== 'closed' && (
@@ -325,14 +326,14 @@ export default function ComplaintDetail() {
                   <select
                     value={assignStaffId}
                     onChange={(e) => setAssignStaffId(e.target.value)}
-                    className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="flex-1 px-3 py-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-sm text-white focus:outline-none focus:border-white/20"
                   >
                     <option value="">Select staff...</option>
                     {staffList.map((s) => (
                       <option key={s.id} value={s.id}>{s.full_name}</option>
                     ))}
                   </select>
-                  <Button size="sm" onClick={handleAssign} disabled={!assignStaffId}>Assign</Button>
+                  <Button size="sm" onClick={handleAssign} disabled={!assignStaffId} className="bg-white text-black hover:bg-zinc-200">Assign</Button>
                 </div>
               )}
             </CardContent>
@@ -342,34 +343,34 @@ export default function ComplaintDetail() {
           {canEdit && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-primary" /> Management
+                <CardTitle className="text-base flex items-center gap-2 text-zinc-200">
+                  <ShieldCheck className="w-4 h-4 text-white/70" /> Management
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground uppercase">Status</label>
+                  <label className="text-xs font-medium text-zinc-500 uppercase">Status</label>
                   <div className="flex gap-2">
                     <select
                       value={statusUpdate}
                       onChange={(e) => setStatusUpdate(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="flex-1 px-3 py-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-sm text-white focus:outline-none focus:border-white/20"
                     >
                       <option value="">Update Status...</option>
                       <option value="in_progress">In Progress</option>
                       <option value="resolved">Resolved</option>
                       <option value="closed">Closed</option>
                     </select>
-                    <Button size="sm" onClick={handleStatusChange} disabled={!statusUpdate}>Update</Button>
+                    <Button size="sm" onClick={handleStatusChange} disabled={!statusUpdate} className="bg-white text-black hover:bg-zinc-200">Update</Button>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground uppercase">Priority</label>
+                  <label className="text-xs font-medium text-zinc-500 uppercase">Priority</label>
                   <div className="flex gap-2">
                     <select
                       value={priorityUpdate}
                       onChange={(e) => setPriorityUpdate(e.target.value)}
-                      className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      className="flex-1 px-3 py-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-sm text-white focus:outline-none focus:border-white/20"
                     >
                       <option value="">Change Priority...</option>
                       <option value="low">Low</option>
@@ -387,18 +388,18 @@ export default function ComplaintDetail() {
           {/* Evidence Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Paperclip className="w-4 h-4 text-primary" /> Evidence & Files
+              <CardTitle className="text-base flex items-center gap-2 text-zinc-200">
+                <Paperclip className="w-4 h-4 text-white/70" /> Evidence & Files
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {evidence.length === 0 && !uploading && <p className="text-sm text-muted-foreground italic">No evidence uploaded.</p>}
+              {evidence.length === 0 && !uploading && <p className="text-sm text-zinc-500 italic">No evidence uploaded.</p>}
               <ul className="space-y-2">
                 {evidence.map((e) => (
-                  <li key={e.id} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group">
+                  <li key={e.id} className="flex items-center justify-between p-2 rounded-lg bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 transition-colors group">
                     <div className="flex items-center gap-2 overflow-hidden">
-                      <FileText className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-slate-300 truncate">{e.file_name}</span>
+                      <FileText className="w-4 h-4 text-zinc-500" />
+                      <span className="text-sm text-zinc-300 truncate">{e.file_name}</span>
                     </div>
                     <button
                       onClick={async () => {
@@ -410,7 +411,7 @@ export default function ComplaintDetail() {
                         a.click()
                         URL.revokeObjectURL(url)
                       }}
-                      className="text-primary hover:text-primary-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="text-white hover:text-primary-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Download className="w-4 h-4" />
                     </button>
@@ -420,8 +421,8 @@ export default function ComplaintDetail() {
 
               {user && (isCreator || canEdit) && (
                 <div className="pt-2">
-                  <label className="flex items-center justify-center w-full px-4 py-3 rounded-lg border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-white/5 transition-all cursor-pointer group">
-                    <span className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-primary">
+                  <label className="flex items-center justify-center w-full px-4 py-3 rounded-lg border-2 border-dashed border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900 transition-all cursor-pointer group">
+                    <span className="flex items-center gap-2 text-sm text-zinc-500 group-hover:text-white">
                       {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                       {uploading ? 'Uploading...' : 'Upload File'}
                     </span>
@@ -456,7 +457,7 @@ export default function ComplaintDetail() {
                         onClick={() => setFeedbackRating(n)}
                         className={cn(
                           "w-9 h-9 rounded-lg text-sm font-bold transition-all",
-                          feedbackRating >= n ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/25 scale-110' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'
+                          feedbackRating >= n ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/25 scale-110' : 'bg-zinc-800 text-zinc-500 hover:bg-zinc-700'
                         )}
                       >
                         {n}
@@ -468,7 +469,7 @@ export default function ComplaintDetail() {
                       value={feedbackComment}
                       onChange={(e) => setFeedbackComment(e.target.value)}
                       placeholder="Add a comment..."
-                      className="bg-slate-900/50 border-amber-500/20 focus:border-amber-500/50"
+                      className="bg-zinc-900/50 border-amber-500/20 focus:border-amber-500/50 placeholder:text-zinc-600"
                     />
                     <Button type="submit" size="icon" className="bg-amber-500 hover:bg-amber-600 text-black">
                       <Send className="w-4 h-4" />
@@ -495,11 +496,10 @@ export default function ComplaintDetail() {
                   </div>
                   <span className="text-sm font-medium text-white">{feedback.rating}/5</span>
                 </div>
-                {feedback.comment && <p className="text-slate-300 text-sm italic">"{feedback.comment}"</p>}
+                {feedback.comment && <p className="text-zinc-300 text-sm italic">"{feedback.comment}"</p>}
               </CardContent>
             </Card>
           )}
-
         </motion.div>
       </div>
     </div>

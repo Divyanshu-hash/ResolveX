@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { motion } from 'framer-motion'
-import { Hexagon, Lock, Mail, ArrowRight, Loader2 } from 'lucide-react'
+import { Hexagon, Lock, Mail, ArrowRight, Loader2, AlertTriangle } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card'
@@ -31,32 +31,31 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/20 blur-[120px] rounded-full pointer-events-none opacity-50" />
-      <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.04] mix-blend-overlay pointer-events-none" />
+      {/* Stealth Ambient Background */}
+      <div className="bg-stealth-curves absolute inset-0 z-0 opacity-40 mix-blend-screen" />
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center shadow-lg shadow-primary/25 mx-auto mb-6"
+            className="w-12 h-12 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center mx-auto mb-6"
           >
-            <Hexagon className="text-white w-10 h-10 fill-white/20" />
+            <Hexagon className="text-white w-6 h-6 fill-white" />
           </motion.div>
-          <h1 className="text-3xl font-bold font-heading tracking-tight text-white">Welcome Back</h1>
-          <p className="text-muted-foreground mt-2">Enter your credentials to access ResolveX</p>
+          <h1 className="text-2xl font-bold font-heading tracking-tight text-white">Welcome Back</h1>
+          <p className="text-zinc-500 mt-2">Enter your credentials to access ResolveX</p>
         </div>
 
-        <Card className="border-white/10 shadow-2xl shadow-black/50 bg-slate-900/60 backdrop-blur-xl">
+        <Card className="border-zinc-800 bg-zinc-900/50 backdrop-blur-md">
           <CardHeader>
-            <CardTitle className="text-center">Sign In</CardTitle>
-            <CardDescription className="text-center">Authenticate with your enterprise account</CardDescription>
+            <CardTitle className="text-center text-white">Sign In</CardTitle>
+            <CardDescription className="text-center text-zinc-500">Authenticate with your enterprise account</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -64,21 +63,21 @@ export default function Login() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-center gap-2"
+                  className="p-3 rounded bg-red-500/10 border border-red-500/20 text-red-500 text-sm flex items-center gap-2"
                 >
                   <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
                 </motion.div>
               )}
 
               <div className="space-y-2">
-                <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Email Address</label>
+                <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Email Address</label>
                 <div className="relative group">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                   <Input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-slate-950/50 border-white/5 focus:border-primary/50"
+                    className="pl-10 bg-zinc-950/50 border-zinc-800 focus:border-white/20 text-white placeholder:text-zinc-700"
                     placeholder="name@company.com"
                     required
                   />
@@ -87,16 +86,16 @@ export default function Login() {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Password</label>
-                  <a href="#" className="text-xs text-primary hover:text-primary-300 transition-colors">Forgot password?</a>
+                  <label className="text-xs font-medium text-zinc-500 ml-1 uppercase tracking-wider">Password</label>
+                  <a href="#" className="text-xs text-zinc-400 hover:text-white transition-colors">Forgot password?</a>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500 group-focus-within:text-white transition-colors" />
                   <Input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-slate-950/50 border-white/5 focus:border-primary/50"
+                    className="pl-10 bg-zinc-950/50 border-zinc-800 focus:border-white/20 text-white placeholder:text-zinc-700"
                     placeholder="••••••••"
                     required
                   />
@@ -105,7 +104,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full mt-2"
+                className="w-full mt-2 bg-white text-black hover:bg-zinc-200"
                 size="lg"
                 disabled={loading}
               >
@@ -123,34 +122,13 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        <p className="mt-8 text-center text-muted-foreground text-sm">
+        <p className="mt-8 text-center text-zinc-500 text-sm">
           Don't have an account?{' '}
-          <Link to="/register" className="text-primary hover:text-primary-300 transition-colors font-medium">
+          <Link to="/register" className="text-white hover:underline transition-colors font-medium">
             Register for access
           </Link>
         </p>
       </motion.div>
     </div>
-  )
-}
-
-function AlertTriangle(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-      <path d="M12 9v4" />
-      <path d="M12 17h.01" />
-    </svg>
   )
 }

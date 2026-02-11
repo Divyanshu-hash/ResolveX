@@ -5,12 +5,12 @@ import { motion } from 'framer-motion'
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     ({ className, ...props }, ref) => (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             ref={ref}
             className={cn(
-                "glass-card rounded-2xl border border-white/5 bg-slate-900/40 text-card-foreground shadow-xl backdrop-blur-xl",
+                "stealth-card rounded-xl border border-zinc-800 bg-zinc-950/40 text-card-foreground shadow-sm",
                 className
             )}
             {...props}
@@ -34,7 +34,7 @@ const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingEle
     ({ className, ...props }, ref) => (
         <h3
             ref={ref}
-            className={cn("text-xl font-bold font-heading leading-none tracking-tight text-white", className)}
+            className={cn("text-lg font-bold font-heading leading-none tracking-tight text-white", className)}
             {...props}
         />
     )
@@ -45,7 +45,7 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
     ({ className, ...props }, ref) => (
         <p
             ref={ref}
-            className={cn("text-sm text-muted-foreground", className)}
+            className={cn("text-sm text-zinc-400 font-medium", className)}
             {...props}
         />
     )
