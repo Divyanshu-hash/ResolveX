@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { API } from '../context/AuthContext'
 import { useAuth } from '../context/AuthContext'
+import { motion } from 'framer-motion'
+import {
+  Activity,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  ArrowRight,
+  Plus
+} from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
+import { Button, buttonVariants } from '../components/ui/Button'
+import { cn } from '../lib/utils'
 
 type Summary = {
   total_complaints: number
@@ -38,104 +50,230 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500" />
+      <div className="h-full flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary shadow-[0_0_20px_-5px_rgba(6,182,212,0.5)]" />
+          <p className="text-muted-foreground animate-pulse text-sm">Loading Dashboard...</p>
+        </div>
       </div>
     )
   }
 
-  const cards = [
-    { label: 'Total Complaints', value: summary?.total_complaints ?? recent.length, color: 'primary' },
-    { label: 'Open', value: summary?.open_complaints ?? '-', color: 'amber' },
-    { label: 'Resolved', value: summary?.resolved_complaints ?? '-', color: 'emerald' },
-    { label: 'Escalated', value: summary?.escalated_complaints ?? '-', color: 'red' },
+  const stats = [
+    {
+      label: 'Total Tickets',
+      value: summary?.total_complaints ?? recent.length,
+      icon: Activity,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+      border: 'border-primary/20'
+    },
+    {
+      label: 'Open Issues',
+      value: summary?.open_complaints ?? '-',
+      icon: Clock,
+      color: 'text-amber-400',
+      bg: 'bg-amber-400/10',
+      border: 'border-amber-400/20'
+    },
+    {
+      label: 'Resolved',
+      value: summary?.resolved_complaints ?? '-',
+      icon: CheckCircle2,
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10',
+      border: 'border-emerald-400/20'
+    },
+    {
+      label: 'Escalated',
+      value: summary?.escalated_complaints ?? '-',
+      icon: AlertTriangle,
+      color: 'text-red-400',
+      bg: 'bg-red-400/10',
+      border: 'border-red-400/20'
+    },
   ]
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  }
+
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
-        <p className="text-slate-400 mt-1">Welcome back, {user?.full_name}</p>
-      </div>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <div>
+          <h1 className="text-3xl font-bold font-heading text-white tracking-tight">Dashboard Web</h1>
+          <p className="text-muted-foreground mt-1 text-lg">Overview of system health and recent tickets</p>
+        </div>
+        <Link
+          to="/complaints/new"
+          className={cn(buttonVariants({ variant: "glass", size: "lg" }), "group")}
+        >
+          <Plus className="w-4 h-4 mr-2 group-hover:rotate-90 transition-transform" />
+          New Ticket
+        </Link>
+      </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {cards.map((c) => (
-          <div
-            key={c.label}
-            className="bg-slate-900 border border-slate-700 rounded-xl p-5 hover:border-slate-600 transition-colors"
-          >
-            <p className="text-slate-400 text-sm font-medium">{c.label}</p>
-            <p className="text-2xl font-bold text-slate-100 mt-1">{c.value}</p>
-          </div>
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
+        {stats.map((stat) => (
+          <motion.div key={stat.label} variants={item}>
+            <Card className="hover:bg-slate-800/60 transition-colors duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                    <p className="text-3xl font-bold font-heading text-white mt-2">{stat.value}</p>
+                  </div>
+                  <div className={cn("p-3 rounded-xl border backdrop-blur-md", stat.bg, stat.color, stat.border)}>
+                    <stat.icon className="w-6 h-6" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      {summary?.avg_resolution_hours != null && (
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-5 mb-8">
-          <p className="text-slate-400 text-sm font-medium">Average resolution time</p>
-          <p className="text-2xl font-bold text-slate-100 mt-1">
-            {Math.round(summary.avg_resolution_hours)} hours
-          </p>
-        </div>
-      )}
-
-      <div className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-100">Recent complaints</h2>
-          <Link
-            to="/complaints"
-            className="text-sm text-primary-400 hover:underline"
-          >
-            View all
-          </Link>
-        </div>
-        <div className="overflow-x-auto">
-          {recent.length === 0 ? (
-            <div className="p-8 text-center text-slate-500">
-              No complaints yet.{' '}
-              <Link to="/complaints/new" className="text-primary-400 hover:underline">
-                Create one
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <motion.div
+          className="lg:col-span-2 space-y-8"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="h-full">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Recent Activity</CardTitle>
+              <Link
+                to="/complaints"
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-primary hover:text-primary-300")}
+              >
+                View All <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
-            </div>
-          ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-slate-400 text-sm border-b border-slate-700">
-                  <th className="p-4 font-medium">Title</th>
-                  <th className="p-4 font-medium">Status</th>
-                  <th className="p-4 font-medium">Priority</th>
-                  <th className="p-4 font-medium">Created</th>
-                  <th className="p-4 font-medium"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {recent.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-800 hover:bg-slate-800/50">
-                    <td className="p-4 text-slate-200">{r.title}</td>
-                    <td className="p-4">
-                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-300 capitalize">
-                        {r.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2 py-0.5 rounded text-xs font-medium capitalize bg-primary-600/30 text-primary-300">
-                        {r.priority}
-                      </span>
-                    </td>
-                    <td className="p-4 text-slate-400 text-sm">
-                      {new Date(r.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-4">
-                      <Link to={`/complaints/${r.id}`} className="text-primary-400 hover:underline text-sm">
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            </CardHeader>
+            <CardContent>
+              {recent.length === 0 ? (
+                <div className="py-12 text-center">
+                  <div className="w-16 h-16 bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/5">
+                    <Activity className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <p className="text-muted-foreground">No recent activity found</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {recent.map((r, i) => (
+                    <motion.div
+                      key={r.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + (i * 0.1) }}
+                      className="group flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-primary/20 transition-all duration-300"
+                    >
+                      <div className="flex-1 min-w-0 mr-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={cn(
+                            "w-2 h-2 rounded-full",
+                            r.priority === 'high' ? "bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" :
+                              r.priority === 'medium' ? "bg-amber-500" : "bg-emerald-500"
+                          )} />
+                          <h4 className="text-sm font-medium text-white truncate group-hover:text-primary transition-colors">{r.title}</h4>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Created {new Date(r.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={cn(
+                          "px-2.5 py-1 rounded-md text-xs font-medium border",
+                          r.status === 'open' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
+                            r.status === 'resolved' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                              "bg-blue-500/10 text-blue-500 border-blue-500/20"
+                        )}>
+                          {r.status.replace('_', ' ')}
+                        </span>
+                        <Link
+                          to={`/complaints/${r.id}`}
+                          className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "h-8 w-8 text-muted-foreground hover:text-primary")}
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          className="space-y-6"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {summary?.avg_resolution_hours != null && (
+            <Card className="bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border-primary/20">
+              <CardContent className="p-6 relative overflow-hidden">
+                <div className="absolute -right-6 -top-6 w-32 h-32 bg-primary/20 blur-[50px] rounded-full" />
+                <p className="text-sm font-medium text-primary-200">Avg Resolution Time</p>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-4xl font-bold font-heading text-white">{Math.round(summary.avg_resolution_hours)}</span>
+                  <span className="text-sm text-primary-200">hours</span>
+                </div>
+              </CardContent>
+            </Card>
           )}
-        </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">System Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Database</span>
+                <span className="flex items-center text-emerald-400 gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  Operational
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">API Gateway</span>
+                <span className="flex items-center text-emerald-400 gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  Operational
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Storage</span>
+                <span className="flex items-center text-emerald-400 gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                  Operational
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </div>
   )

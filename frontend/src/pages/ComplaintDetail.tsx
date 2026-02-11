@@ -2,6 +2,31 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { API } from '../context/AuthContext'
 import { useAuth } from '../context/AuthContext'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  ArrowLeft,
+  MapPin,
+  User,
+  Calendar,
+  Tag,
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Upload,
+  Download,
+  Send,
+  History,
+  MessageSquare,
+  HelpCircle,
+  Paperclip,
+  Loader2
+} from 'lucide-react'
+import { Button } from '../components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
+import { Input } from '../components/ui/Input'
+import { cn } from '../lib/utils'
 
 type Complaint = {
   id: number
@@ -31,6 +56,22 @@ type Log = {
 }
 
 type Evidence = { id: number; file_name: string; file_type: string; created_at: string }
+
+const statusConfig: Record<string, { label: string, color: string, icon: any }> = {
+  'open': { label: 'Open', color: 'text-amber-500 bg-amber-500/10 border-amber-500/20', icon: Clock },
+  'submitted': { label: 'Submitted', color: 'text-blue-500 bg-blue-500/10 border-blue-500/20', icon: HelpCircle },
+  'in_progress': { label: 'In Progress', color: 'text-purple-500 bg-purple-500/10 border-purple-500/20', icon: Clock },
+  'resolved': { label: 'Resolved', color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20', icon: CheckCircle2 },
+  'closed': { label: 'Closed', color: 'text-slate-500 bg-slate-500/10 border-slate-500/20', icon: CheckCircle2 },
+  'default': { label: 'Unknown', color: 'text-slate-500', icon: HelpCircle }
+}
+
+const priorityConfig: Record<string, { label: string, color: string }> = {
+  'low': { label: 'Low', color: 'text-slate-400 bg-slate-500/10 border-slate-500/20' },
+  'medium': { label: 'Medium', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+  'high': { label: 'High', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+  'critical': { label: 'Critical', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
+}
 
 export default function ComplaintDetail() {
   const { id } = useParams<{ id: string }>()
@@ -126,8 +167,11 @@ export default function ComplaintDetail() {
 
   if (loading || !complaint) {
     return (
-      <div className="p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary-500" />
+      <div className="h-full flex items-center justify-center min-h-[50vh]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary shadow-[0_0_20px_-5px_rgba(6,182,212,0.5)]" />
+          <p className="text-muted-foreground animate-pulse text-sm">Loading details...</p>
+        </div>
       </div>
     )
   }
@@ -136,205 +180,327 @@ export default function ComplaintDetail() {
   const isCreator = complaint.user_name === user?.full_name
   const canGiveFeedback = isCreator && ['resolved', 'closed'].includes(complaint.status) && !feedback
 
+  const StatusIcon = (statusConfig[complaint.status] || statusConfig.default).icon
+
   return (
-    <div className="p-8 max-w-4xl">
-      <button onClick={() => navigate(-1)} className="text-slate-400 hover:text-slate-200 text-sm mb-4">
-        ← Back
-      </button>
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        <h1 className="text-2xl font-bold text-slate-100">{complaint.title}</h1>
-        <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-300 capitalize">
-          {complaint.status.replace('_', ' ')}
-        </span>
-        <span className="px-2 py-0.5 rounded text-xs font-medium capitalize bg-primary-600/30 text-primary-300">
-          {complaint.priority}
-          {complaint.is_escalated && ' ⬆ Escalated'}
-        </span>
-      </div>
+    <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+      >
+        <Button variant="ghost" className="mb-4 pl-0 hover:bg-transparent hover:text-primary" onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Complaints
+        </Button>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="bg-slate-900 border border-slate-700 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-slate-100 mb-3">Details</h2>
-          <p className="text-slate-300 whitespace-pre-wrap">{complaint.description}</p>
-          {complaint.location && (
-            <p className="text-slate-400 text-sm mt-2">Location: {complaint.location}</p>
-          )}
-          <p className="text-slate-500 text-sm mt-2">
-            Category: {complaint.category_name ?? 'Uncategorized'} · Created by {complaint.user_name} ·{' '}
-            {new Date(complaint.created_at).toLocaleString()}
-          </p>
-          {complaint.assigned_staff_name && (
-            <p className="text-slate-400 text-sm mt-1">Assigned to: {complaint.assigned_staff_name}</p>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          {canEdit && (user?.role === 'admin' || user?.role === 'super_admin') && complaint.status !== 'closed' && (
-            <div className="bg-slate-900 border border-slate-700 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-slate-300 mb-2">Assign to staff</h3>
-              <div className="flex gap-2">
-                <select
-                  value={assignStaffId}
-                  onChange={(e) => setAssignStaffId(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm"
-                >
-                  <option value="">Select staff</option>
-                  {staffList.map((s) => (
-                    <option key={s.id} value={s.id}>{s.full_name}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleAssign}
-                  disabled={!assignStaffId}
-                  className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm disabled:opacity-50"
-                >
-                  Assign
-                </button>
+        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-bold font-heading text-white tracking-tight">{complaint.title}</h1>
+              <div className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium border", (statusConfig[complaint.status] || statusConfig.default).color)}>
+                <StatusIcon className="w-4 h-4" />
+                {(statusConfig[complaint.status] || statusConfig.default).label}
               </div>
             </div>
-          )}
-
-          {canEdit && (
-            <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
-              <div className="flex gap-2 items-center">
-                <select
-                  value={statusUpdate}
-                  onChange={(e) => setStatusUpdate(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm"
-                >
-                  <option value="">Update status</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
-                </select>
-                <button
-                  onClick={handleStatusChange}
-                  disabled={!statusUpdate}
-                  className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm disabled:opacity-50"
-                >
-                  Update
-                </button>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <Tag className="w-4 h-4" />
+                <span>{complaint.category_name || 'Uncategorized'}</span>
               </div>
-              <div className="flex gap-2 items-center">
-                <select
-                  value={priorityUpdate}
-                  onChange={(e) => setPriorityUpdate(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm"
-                >
-                  <option value="">Change priority</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="critical">Critical</option>
-                </select>
-                <button
-                  onClick={handlePriorityChange}
-                  disabled={!priorityUpdate}
-                  className="px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white text-sm disabled:opacity-50"
-                >
-                  Update
-                </button>
+              <div className="flex items-center gap-1.5">
+                <User className="w-4 h-4" />
+                <span>Created by <span className="text-slate-300">{complaint.user_name}</span></span>
               </div>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" />
+                <span>{new Date(complaint.created_at).toLocaleString()}</span>
+              </div>
+              {complaint.location && (
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4" />
+                  <span>{complaint.location}</span>
+                </div>
+              )}
             </div>
-          )}
-
-          <div className="bg-slate-900 border border-slate-700 rounded-xl p-4">
-            <h3 className="text-sm font-medium text-slate-300 mb-2">Evidence</h3>
-            {evidence.length === 0 && !uploading && <p className="text-slate-500 text-sm">No files</p>}
-            <ul className="space-y-1 mb-2">
-              {evidence.map((e) => (
-                <li key={e.id} className="text-sm flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const { data } = await API.get(`/evidence/file/${e.id}`, { responseType: 'blob' })
-                      const url = URL.createObjectURL(data)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = e.file_name
-                      a.click()
-                      URL.revokeObjectURL(url)
-                    }}
-                    className="text-primary-400 hover:underline"
-                  >
-                    {e.file_name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-            {user && (isCreator || canEdit) && (
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="text-sm text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary-600 file:text-white"
-              />
-            )}
           </div>
 
-          {canGiveFeedback && (
-            <div className="bg-slate-900 border border-slate-700 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-slate-300 mb-2">Rate resolution</h3>
-              <form onSubmit={handleFeedback} className="space-y-2">
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      onClick={() => setFeedbackRating(n)}
-                      className={`w-8 h-8 rounded text-sm ${feedbackRating >= n ? 'bg-amber-500 text-black' : 'bg-slate-700 text-slate-400'}`}
-                    >
-                      {n}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={feedbackComment}
-                  onChange={(e) => setFeedbackComment(e.target.value)}
-                  placeholder="Comment (optional)"
-                  className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-600 text-slate-200 text-sm"
-                />
-                <button type="submit" className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm">
-                  Submit feedback
-                </button>
-              </form>
+          <div className="flex items-center gap-3">
+            <div className={cn("flex items-center gap-2 px-4 py-2 rounded-lg border bg-slate-900/50 backdrop-blur-sm", (priorityConfig[complaint.priority] || priorityConfig.low).color)}>
+              <AlertTriangle className="w-4 h-4" />
+              <span className="font-medium uppercase tracking-wider text-xs">Priority: {complaint.priority}</span>
             </div>
+            {complaint.is_escalated && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-red-500/10 border-red-500/20 text-red-400">
+                <ShieldCheck className="w-4 h-4" />
+                <span className="font-medium uppercase tracking-wider text-xs">Escalated</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+        <motion.div
+          className="lg:col-span-2 space-y-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-invert max-w-none text-slate-300 whitespace-pre-wrap leading-relaxed">
+                {complaint.description}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                Timeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative pl-4 border-l border-white/10 space-y-8 ml-2">
+                {logs.length === 0 && <p className="text-muted-foreground text-sm italic">No activity recorded yet.</p>}
+                {logs.map((log, index) => (
+                  <div key={log.id} className="relative">
+                    <div className="absolute -left-[21px] top-1.5 w-3 h-3 rounded-full bg-slate-800 border border-primary/50 ring-4 ring-slate-900" />
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium text-white capitalize">{log.action.replace('_', ' ')}</span>
+                        <span className="text-xs text-muted-foreground">• {new Date(log.created_at).toLocaleString()}</span>
+                      </div>
+                      <p className="text-sm text-slate-400">
+                        {log.user_name ?? 'System'}
+                        {log.old_value && log.new_value && (
+                          <span className="text-slate-500"> changed from <span className="text-slate-300">{log.old_value}</span> to <span className="text-slate-300">{log.new_value}</span></span>
+                        )}
+                        {log.message && <span className="text-slate-400"> — {log.message}</span>}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          className="space-y-6"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {/* Assigned Staff Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <User className="w-4 h-4 text-primary" /> Assigned Staff
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {complaint.assigned_staff_name ? (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/5">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-cyan-400 flex items-center justify-center text-black font-bold">
+                    {complaint.assigned_staff_name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-medium text-white">{complaint.assigned_staff_name}</p>
+                    <p className="text-xs text-muted-foreground">Staff Member</p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground italic">No staff assigned yet.</p>
+              )}
+
+              {canEdit && (user?.role === 'admin' || user?.role === 'super_admin') && complaint.status !== 'closed' && (
+                <div className="flex gap-2 pt-2">
+                  <select
+                    value={assignStaffId}
+                    onChange={(e) => setAssignStaffId(e.target.value)}
+                    className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="">Select staff...</option>
+                    {staffList.map((s) => (
+                      <option key={s.id} value={s.id}>{s.full_name}</option>
+                    ))}
+                  </select>
+                  <Button size="sm" onClick={handleAssign} disabled={!assignStaffId}>Assign</Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actions Card */}
+          {canEdit && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-primary" /> Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase">Status</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={statusUpdate}
+                      onChange={(e) => setStatusUpdate(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="">Update Status...</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="resolved">Resolved</option>
+                      <option value="closed">Closed</option>
+                    </select>
+                    <Button size="sm" onClick={handleStatusChange} disabled={!statusUpdate}>Update</Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground uppercase">Priority</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={priorityUpdate}
+                      onChange={(e) => setPriorityUpdate(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="">Change Priority...</option>
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                      <option value="critical">Critical</option>
+                    </select>
+                    <Button size="sm" variant="secondary" onClick={handlePriorityChange} disabled={!priorityUpdate}>Update</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Evidence Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Paperclip className="w-4 h-4 text-primary" /> Evidence & Files
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {evidence.length === 0 && !uploading && <p className="text-sm text-muted-foreground italic">No evidence uploaded.</p>}
+              <ul className="space-y-2">
+                {evidence.map((e) => (
+                  <li key={e.id} className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-slate-300 truncate">{e.file_name}</span>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        const { data } = await API.get(`/evidence/file/${e.id}`, { responseType: 'blob' })
+                        const url = URL.createObjectURL(data)
+                        const a = document.createElement('a')
+                        a.href = url
+                        a.download = e.file_name
+                        a.click()
+                        URL.revokeObjectURL(url)
+                      }}
+                      className="text-primary hover:text-primary-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Download className="w-4 h-4" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+
+              {user && (isCreator || canEdit) && (
+                <div className="pt-2">
+                  <label className="flex items-center justify-center w-full px-4 py-3 rounded-lg border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-white/5 transition-all cursor-pointer group">
+                    <span className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-primary">
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      {uploading ? 'Uploading...' : 'Upload File'}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Feedback Card */}
+          {canGiveFeedback && (
+            <Card className="border-amber-500/20 bg-amber-500/5">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2 text-amber-500">
+                  <MessageSquare className="w-4 h-4" /> Rate Resolution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleFeedback} className="space-y-4">
+                  <div className="flex justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setFeedbackRating(n)}
+                        className={cn(
+                          "w-9 h-9 rounded-lg text-sm font-bold transition-all",
+                          feedbackRating >= n ? 'bg-amber-500 text-black shadow-lg shadow-amber-500/25 scale-110' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'
+                        )}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={feedbackComment}
+                      onChange={(e) => setFeedbackComment(e.target.value)}
+                      placeholder="Add a comment..."
+                      className="bg-slate-900/50 border-amber-500/20 focus:border-amber-500/50"
+                    />
+                    <Button type="submit" size="icon" className="bg-amber-500 hover:bg-amber-600 text-black">
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
           )}
 
           {feedback && (
-            <div className="bg-slate-900 border border-slate-700 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-slate-300 mb-1">Your feedback</h3>
-              <p className="text-amber-400">Rating: {feedback.rating}/5</p>
-              {feedback.comment && <p className="text-slate-400 text-sm mt-1">{feedback.comment}</p>}
-            </div>
+            <Card className="border-green-500/20 bg-green-500/5">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2 text-green-500">
+                  <CheckCircle2 className="w-4 h-4" /> User Feedback
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex">
+                    {[...Array(feedback.rating)].map((_, i) => (
+                      <span key={i} className="text-amber-500 text-lg">★</span>
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium text-white">{feedback.rating}/5</span>
+                </div>
+                {feedback.comment && <p className="text-slate-300 text-sm italic">"{feedback.comment}"</p>}
+              </CardContent>
+            </Card>
           )}
-        </div>
-      </div>
 
-      <div className="mt-8 bg-slate-900 border border-slate-700 rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-slate-100 mb-4">Timeline</h2>
-        <ul className="space-y-4">
-          {logs.length === 0 && <p className="text-slate-500 text-sm">No activity yet</p>}
-          {logs.map((l) => (
-            <li key={l.id} className="flex gap-3">
-              <div className="w-2 h-2 rounded-full bg-primary-500 mt-1.5 shrink-0" />
-              <div>
-                <p className="text-slate-200 text-sm">
-                  <span className="font-medium capitalize">{l.action.replace('_', ' ')}</span>
-                  {l.old_value && l.new_value && (
-                    <span className="text-slate-500"> {l.old_value} → {l.new_value}</span>
-                  )}
-                  {l.message && <span className="text-slate-400"> — {l.message}</span>}
-                </p>
-                <p className="text-slate-500 text-xs mt-0.5">
-                  {l.user_name ?? 'System'} · {new Date(l.created_at).toLocaleString()}
-                </p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        </motion.div>
       </div>
     </div>
   )
